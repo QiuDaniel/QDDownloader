@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="WbK-CP-zcD">
+                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="DownloadViewCell" rowHeight="70" id="Khk-ka-zNS" customClass="DownloadViewCell">
+                                        <rect key="frame" x="0.0" y="28" width="375" height="70"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Khk-ka-zNS" id="lB7-bq-Wzm">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="69.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RO6-OY-t66" userLabel="Download Button">
+                                                    <rect key="frame" x="332" y="19" width="31" height="30"/>
+                                                    <state key="normal" title="下载">
+                                                        <color key="titleColor" red="1" green="0.0" blue="0.4431372549" alpha="1" colorSpace="calibratedRGB"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="downloadBtnClicked:" destination="Khk-ka-zNS" eventType="touchUpInside" id="n5V-nH-qll"/>
+                                                    </connections>
+                                                </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="文件名" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZIY-8o-Z2d" userLabel="Name Label">
+                                                    <rect key="frame" x="12" y="16" width="46" height="18"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FZx-6b-1YV" userLabel="Download Progress View">
+                                                    <rect key="frame" x="35" y="34" width="287" height="2"/>
+                                                    <color key="progressTintColor" red="1" green="0.0" blue="0.4431372549" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </progressView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="FZx-6b-1YV" firstAttribute="leading" secondItem="lB7-bq-Wzm" secondAttribute="leadingMargin" constant="20" id="5tY-fC-mug"/>
+                                                <constraint firstItem="FZx-6b-1YV" firstAttribute="trailing" secondItem="RO6-OY-t66" secondAttribute="leading" constant="-10" id="9i1-Xz-MKm"/>
+                                                <constraint firstItem="FZx-6b-1YV" firstAttribute="centerY" secondItem="lB7-bq-Wzm" secondAttribute="centerY" id="DZf-Xh-XwM"/>
+                                                <constraint firstAttribute="trailing" secondItem="RO6-OY-t66" secondAttribute="trailing" constant="12" id="GCR-Xa-MZj"/>
+                                                <constraint firstItem="ZIY-8o-Z2d" firstAttribute="leading" secondItem="lB7-bq-Wzm" secondAttribute="leading" constant="12" id="Y8H-S4-KPy"/>
+                                                <constraint firstItem="RO6-OY-t66" firstAttribute="centerY" secondItem="lB7-bq-Wzm" secondAttribute="centerY" id="pVP-X6-uBR"/>
+                                                <constraint firstItem="ZIY-8o-Z2d" firstAttribute="centerY" secondItem="lB7-bq-Wzm" secondAttribute="centerY" constant="-10" id="tS0-iw-mR7"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="downloadBtn" destination="RO6-OY-t66" id="LNf-bk-rWp"/>
+                                            <outlet property="nameLabel" destination="ZIY-8o-Z2d" id="ML0-TU-fJO"/>
+                                            <outlet property="progressView" destination="FZx-6b-1YV" id="oM5-dK-0yn"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="gZj-SZ-e4R"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="qQf-LI-hjH"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="WbK-CP-zcD" secondAttribute="trailing" id="1dj-FD-af8"/>
+                            <constraint firstItem="WbK-CP-zcD" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="HIg-az-JqX"/>
+                            <constraint firstItem="WbK-CP-zcD" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Xhs-TD-yZl"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="WbK-CP-zcD" secondAttribute="bottom" id="ew6-fI-Rob"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="WbK-CP-zcD" id="YKV-Py-uAA"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+</document>

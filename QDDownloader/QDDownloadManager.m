@@ -10,8 +10,7 @@
 #import "QDDownloadTask.h"
 #import "QDDownloadConfig.h"
 #import "QDFileUtil.h"
-#import "QDGCDUtils.h"
-#import <UIKit/UIKit.h>
+#import <UIKit/UIKit.h>
 
 
 #if __has_include(<AFNetworking/AFNetworking.h>)
@@ -77,13 +76,13 @@ static long int kDefaultTimeDifference = 1728000; //默认20天
     _terminate = [[[NSUserDefaults standardUserDefaults] objectForKey:@"isTerminate"] boolValue];
     _resume = NO;
     [self configureAppState];
-    dispatch_global_async(^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [self dealTmpFile];
     });
 }
 
 - (void)setupWithConfig:(QDDownloadConfig *)config {
-    _manager = [[AFURLSessionManager alloc] initWithSessionConfigureation:_config.configureation];
+    _manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:_config.configureation];
 }
 
 - (void)configureAppState {
@@ -239,6 +238,14 @@ static long int kDefaultTimeDifference = 1728000; //默认20天
     }
 }
 
+- (BOOL)taskDownloading:(NSUInteger)taskId {
+    QDDownloadTask *task = [self getDownloadTaskById:taskId];
+    if (task) {
+        return task.state == NSURLSessionTaskStateRunning;
+    }
+    return NO;
+}
+
 #pragma mark - KVO
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
@@ -271,7 +278,7 @@ static long int kDefaultTimeDifference = 1728000; //默认20天
     if (tempFileList && tempFileList.count > 0) {
         [tempFileList enumerateObjectsUsingBlock:^(NSString * _Nonnull path, NSUInteger idx, BOOL * _Nonnull stop) {
             NSError *error;
-            NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
+            NSDictionary *fileAttributes = [[QDFileUtil fileManager] attributesOfItemAtPath:path error:&error];
             if (fileAttributes) {
                 NSDate *modificationDate = fileAttributes[NSFileModificationDate];
                 NSDate *currentDate = [NSDate date];

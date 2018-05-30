@@ -8,7 +8,6 @@
 
 #import "QDDownloadTask.h"
 #import "QDFileUtil.h"
-#import "QDGCDUtils.h"
 
 #if __has_include(<ZipArchive/ZipArchive.h>)
 #import <ZipArchive/ZipArchive.h>
@@ -49,6 +48,7 @@ static NSString *const kDefualtSavePath = @"/Library/Caches/QDDownload/";
     if (self) {
         _taskIdentifier = 0;
         _download = NO;
+        _cancel = NO;
         _reDownload = NO;
     }
     return self;
@@ -89,7 +89,7 @@ static NSString *const kDefualtSavePath = @"/Library/Caches/QDDownload/";
 
     if ([[QDFileUtil fileManager] fileExistsAtPath:downloadTargetPath]) {
         if ([downloadTargetPath containsString:@".zip"]) {
-            dispatch_global_async(^{
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 [self unzipFileAtPath:downloadTargetPath toDestination:[downloadTargetPath stringByDeletingPathExtension] didFinished:self.didFinishedBlock];
             });
         } else {
@@ -162,7 +162,7 @@ static NSString *const kDefualtSavePath = @"/Library/Caches/QDDownload/";
     NSURL *URL = [NSURL URLWithString:self.strUrl];
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:URL];
     NSString *path = [self getDownloadTargetPath];
-    BOOL resumeDataFileExists = [[NSFileManager defaultManager] fileExistsAtPath:[QDFileUtil incompleteDownloadTempPathForDownloadPath:path].path];
+    BOOL resumeDataFileExists = [[QDFileUtil fileManager] fileExistsAtPath:[QDFileUtil incompleteDownloadTempPathForDownloadPath:path].path];
     NSData *data = [NSData dataWithContentsOfURL:[QDFileUtil incompleteDownloadTempPathForDownloadPath:path]];
     BOOL resumeDataIsValid = [QDFileUtil validateResumeData:data];
     BOOL canBeResumed = resumeDataFileExists && resumeDataIsValid;
@@ -214,7 +214,7 @@ static NSString *const kDefualtSavePath = @"/Library/Caches/QDDownload/";
 - (void)unzipFileAtPath:(NSString *)path toDestination:(NSString *)destination didFinished:(QDDidFinished)didFinishedBlock {
     [SSZipArchive unzipFileAtPath:path toDestination:destination progressHandler:nil completionHandler:^(NSString * _Nonnull path, BOOL succeeded, NSError * _Nonnull error) {
         if (succeeded) {
-            dispatch_main_async_safe(^{
+            dispatch_async(dispatch_get_main_queue(), ^{
                 if (didFinishedBlock) {
                     didFinishedBlock(QDDidFinishedStatusSuceess, [path stringByDeletingPathExtension]);
                 }
@@ -228,33 +228,33 @@ static NSString *const kDefualtSavePath = @"/Library/Caches/QDDownload/";
 #pragma mark - HandleError
 
 - (void)requestDidWithError:(NSError *)error incompleteTempPath:(NSURL *)tempPath filePath:(NSString *)filePath didFinished:(QDDidFinished)didFinishedBlock {
+    if (self.isCancel) {
+        !didFinishedBlock?:didFinishedBlock(QDDidFinishedStatusCancel, filePath);
+        return;
+    }
     if (error) {
         NSData *resumeData = error.userInfo[NSURLSessionDownloadTaskResumeData];
         if (resumeData) {
             [resumeData writeToURL:tempPath atomically:YES];
         }
-        dispatch_main_async_safe(^{
-            if (didFinishedBlock) {
-                if (self.isCancel) {
-                    didFinishedBlock(QDDidFinishedStatusCancel, filePath);
-                } else {
-                    if (error.code == -1001) {
-                        didFinishedBlock(QDDidFinishedStatusTimeOut, filePath);
-                        [[NSNotificationCenter defaultCenter] postNotificationName:QDDownloadTaskDidTimeOutNotification object:nil];
-                    } else {
-                        didFinishedBlock(QDDidFinishedStatusFault, filePath);
-                        [[NSNotificationCenter defaultCenter] postNotificationName:QDDownloadTaskDidCompleteNotification object:nil];
-                    }
-                }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (error.code == -1001) {
+                !didFinishedBlock?:didFinishedBlock(QDDidFinishedStatusTimeOut, filePath);
+                [[NSNotificationCenter defaultCenter] postNotificationName:QDDownloadTaskDidTimeOutNotification object:nil];
+            } else {
+                !didFinishedBlock?:didFinishedBlock(QDDidFinishedStatusFault, filePath);
+                [[NSNotificationCenter defaultCenter] postNotificationName:QDDownloadTaskDidCompleteNotification object:nil];
             }
         });
+        NSString *needDeleteFile = [NSString stringWithFormat:@"%@%@%@",NSHomeDirectory(), kDefualtSavePath, [self key]];
+        [QDFileUtil deleteFile:needDeleteFile];
     } else {
         if (self.isZip) {
-            dispatch_global_async(^{
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 [self unzipFileAtPath:filePath toDestination:[filePath stringByDeletingPathExtension] didFinished:didFinishedBlock];
             });
         } else {
-            dispatch_main_async_safe(^{
+            dispatch_async(dispatch_get_main_queue(), ^{
                 if (didFinishedBlock) {
                     didFinishedBlock(QDDidFinishedStatusSuceess, filePath);
                 }
@@ -268,7 +268,13 @@ static NSString *const kDefualtSavePath = @"/Library/Caches/QDDownload/";
 #pragma mark - Getter
 
 - (NSString *)key {
-    return [QDFileUtil md5StringFormString:[self getDownloadTargetPath]];
+    NSString *md5String = @"";
+    if (!self.md5 || self.md5.length == 0) {
+        md5String = [QDFileUtil md5StringFormString:self.strUrl];
+    } else {
+        md5String = [self.md5 copy];
+    }
+    return md5String;
 }
 
 - (NSURLSessionTaskState)state {

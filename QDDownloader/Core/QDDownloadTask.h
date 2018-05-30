@@ -65,6 +65,7 @@ typedef void(^QDDidFinished)(QDDidFinishedStatus status, NSString *filePath);
 @property (nonatomic, assign, getter=isDownload) BOOL download;
 @property (nonatomic, assign, readonly, getter=isCancel) BOOL cancel;
 
+
 - (void)prepareDownload;
 - (void)resume;
 - (void)cancel;
