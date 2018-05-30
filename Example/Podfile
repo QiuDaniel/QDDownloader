@@ -5,9 +5,5 @@ inhibit_all_warnings!
 target 'Example' do
 
 pod 'QDDownloader', :path => '../'
-#pod 'AFNetworking'
-#pod 'SSZipArchive'
-
-
 
 end
