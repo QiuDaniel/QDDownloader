@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "QDDownloadManager.h"
+#import "QDDownloadConfig.h"
 
 //! Project version number for QDDownloader.
 FOUNDATION_EXPORT double QDDownloaderVersionNumber;
